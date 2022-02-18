@@ -2,7 +2,7 @@ import { useDisclosure } from "@chakra-ui/hooks";
 import { Box, HStack, SimpleGrid, Tag } from "@chakra-ui/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ManageTodo from "../components/ManageTodo";
 import Navbar from "../components/Navbar";
 import SingleTodo from "../components/SingleTodo";
@@ -40,34 +40,19 @@ const Home = () => {
   }, [user]);
 
   useEffect(() => {
-    const todoListener = supabaseClient
-      .from("todos")
-      .on("*", (payload) => {
-        if (payload.eventType !== "DELETE") {
-          const newTodo = payload.new;
-          setTodos((oldTodos) => {
-            const exists = oldTodos.find((todo) => todo.id === newTodo.id);
-            let newTodos;
-            if (exists) {
-              const oldTodoIndex = oldTodos.findIndex(
-                (obj) => obj.id === newTodo.id
-              );
-              oldTodos[oldTodoIndex] = newTodo;
-              newTodos = oldTodos;
-            } else {
-              newTodos = [...oldTodos, newTodo];
-            }
-            newTodos.sort((a, b) => b.id - a.id);
-            return newTodos;
-          });
-        }
-      })
-      .subscribe();
-
-    return () => {
-      todoListener.unsubscribe();
+    const getTodos = () => {
+      supabaseClient
+        .from("todos")
+        .select("*")
+        .order("id", { ascending: false })
+        .then(({ data, err }) => {
+          if (!err) {
+            setTodos(data);
+          }
+        });
     };
-  }, []);
+    getTodos();
+  });
 
   const openHandler = (clickedTodo) => {
     setTodo(clickedTodo);
