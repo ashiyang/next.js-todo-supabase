@@ -29,6 +29,7 @@ function MyApp({ Component, pageProps }) {
         }
       }
     );
+
     return () => {
       authListener.unsubscribe();
     };
@@ -45,11 +46,12 @@ function MyApp({ Component, pageProps }) {
   const handleAuthSession = async (event, session) => {
     await fetch("/api/auth", {
       method: "POST",
-      header: new Headers({ "Content-Type": "application/json" }),
+      headers: new Headers({ "Content-Type": "application/json" }),
       credentials: "same-origin",
       body: JSON.stringify({ event, session }),
     });
   };
+
   return (
     <ChakraProvider theme={customTheme}>
       <Component {...pageProps} />

@@ -7,6 +7,7 @@ import {
   Button,
   Center,
 } from "@chakra-ui/react";
+
 const SingleTodo = ({ todo, openHandler, deleteHandler, isDeleteLoading }) => {
   const getDateInMonthDayYear = (date) => {
     const d = new Date(date);
@@ -18,9 +19,10 @@ const SingleTodo = ({ todo, openHandler, deleteHandler, isDeleteLoading }) => {
       minute: "numeric",
     };
     const n = d.toLocaleDateString("en-US", options);
-    const replase = n.replace(new RegExp(",", "g"), "");
+    const replase = n.replace(new RegExp(",", "g"), " ");
     return replase;
   };
+
   return (
     <Box
       position="relative"

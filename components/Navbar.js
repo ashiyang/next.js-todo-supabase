@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { supabaseClient } from "../lib/client";
 
-const NavBar = ({ onOpen }) => {
+const Navbar = ({ onOpen }) => {
   const router = useRouter();
   const [isLogoutLoading, setIsLogoutLoading] = useState(false);
 
@@ -19,6 +19,7 @@ const NavBar = ({ onOpen }) => {
       setIsLogoutLoading(false);
     }
   };
+
   return (
     <Box height="100%" p="5" bg="gray.100">
       <Box maxW="6xl" mx="auto">
@@ -36,9 +37,11 @@ const NavBar = ({ onOpen }) => {
           <Box>
             <NavLink href="/profile">Profile</NavLink>
             <ButtonGroup spacing="4" ml="6">
-              <Button colorScheme="blue" onClick={onOpen}>
-                Add Todo
-              </Button>
+              {router.pathname === "/" && (
+                <Button colorScheme="blue" onClick={onOpen}>
+                  Add Todo
+                </Button>
+              )}
               <Button
                 colorScheme="red"
                 onClick={logoutHandler}
@@ -54,4 +57,4 @@ const NavBar = ({ onOpen }) => {
   );
 };
 
-export default NavBar;
+export default Navbar;

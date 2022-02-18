@@ -1,20 +1,21 @@
+import { useDisclosure } from "@chakra-ui/hooks";
+import { Box, HStack, SimpleGrid, Tag } from "@chakra-ui/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
+import ManageTodo from "../components/ManageTodo";
 import Navbar from "../components/Navbar";
 import SingleTodo from "../components/SingleTodo";
 import { supabaseClient } from "../lib/client";
-import ManageTodo from "../components/ManageTodo";
-import { useDisclosure } from "@chakra-ui/react";
-import { Box, SimpleGrid, Text, HStack, Tag } from "@chakra-ui/react";
 
 const Home = () => {
   const initialRef = useRef();
   const [todos, setTodos] = useState([]);
   const [todo, setTodo] = useState(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+
   const router = useRouter();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const user = supabaseClient.auth.user();
 
   useEffect(() => {
@@ -24,7 +25,6 @@ const Home = () => {
   }, [user, router]);
 
   useEffect(() => {
-    console.log("gettodos");
     if (user) {
       supabaseClient
         .from("todos")
@@ -38,19 +38,32 @@ const Home = () => {
         });
     }
   }, [user]);
+
   useEffect(() => {
-    console.log("todoListener");
     const todoListener = supabaseClient
       .from("todos")
       .on("*", (payload) => {
-        const newTodo = payload.new;
-        setTodos((oldTodos) => {
-          const newTodos = [...oldTodos, newTodo];
-          newTodos.sort((a, b) => b.id - a.id);
-          return newTodos;
-        });
+        if (payload.eventType !== "DELETE") {
+          const newTodo = payload.new;
+          setTodos((oldTodos) => {
+            const exists = oldTodos.find((todo) => todo.id === newTodo.id);
+            let newTodos;
+            if (exists) {
+              const oldTodoIndex = oldTodos.findIndex(
+                (obj) => obj.id === newTodo.id
+              );
+              oldTodos[oldTodoIndex] = newTodo;
+              newTodos = oldTodos;
+            } else {
+              newTodos = [...oldTodos, newTodo];
+            }
+            newTodos.sort((a, b) => b.id - a.id);
+            return newTodos;
+          });
+        }
       })
       .subscribe();
+
     return () => {
       todoListener.unsubscribe();
     };
@@ -72,11 +85,15 @@ const Home = () => {
     }
     setIsDeleteLoading(false);
   };
+
   return (
     <div>
       <Head>
-        <title>Todo App | Home</title>
-        <meta name="description" content="todoapp in next.js and supabase" />
+        <title>TodoApp</title>
+        <meta
+          name="description"
+          content="Awesome todoapp to store your awesome todos"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
@@ -102,10 +119,10 @@ const Home = () => {
           gap={{ base: "4", md: "6", lg: "8" }}
           m="10"
         >
-          {todos.map((todo) => (
+          {todos.map((todo, index) => (
             <SingleTodo
               todo={todo}
-              key={todo.id}
+              key={index}
               openHandler={openHandler}
               deleteHandler={deleteHandler}
               isDeleteLoading={isDeleteLoading}

@@ -24,6 +24,7 @@ const Profile = () => {
   const [isImageUploadLoading, setIsImageUploadLoading] = useState(false);
 
   const user = supabaseClient.auth.user();
+
   useEffect(() => {
     if (user) {
       setEmail(user.email);
@@ -58,16 +59,18 @@ const Profile = () => {
     }
     setIsLoading(false);
   };
+
   function makeid(length) {
     let result = "";
     const characters =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     const charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
+    for (var i = 0; i < length; i++) {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
   }
+
   const uploadHandler = async (event) => {
     setIsImageUploadLoading(true);
     const avatarFile = event.target.files[0];
@@ -102,6 +105,7 @@ const Profile = () => {
     setAvatarurl(publicURL);
     setIsImageUploadLoading(false);
   };
+
   return (
     <Box>
       <Navbar />
@@ -181,4 +185,5 @@ const Profile = () => {
     </Box>
   );
 };
+
 export default Profile;

@@ -18,7 +18,7 @@ import {
   Text,
   Textarea,
 } from "@chakra-ui/react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabaseClient } from "../lib/client";
 
 const ManageTodo = ({ isOpen, onClose, initialRef, todo, setTodo }) => {
@@ -39,8 +39,8 @@ const ManageTodo = ({ isOpen, onClose, initialRef, todo, setTodo }) => {
   const submitHandler = async (event) => {
     event.preventDefault();
     setErrorMessage("");
-    if (description.length <= 5) {
-      setErrorMessage("Description must have more than 5 characters.");
+    if (description.length <= 10) {
+      setErrorMessage("Description must have more than 10 characters");
       return;
     }
     setIsLoading(true);
@@ -49,7 +49,8 @@ const ManageTodo = ({ isOpen, onClose, initialRef, todo, setTodo }) => {
     if (todo) {
       const { error } = await supabaseClient
         .from("todos")
-        .insert([{ title, description, isComplete, user_id: user.id }]);
+        .update({ title, description, isComplete, user_id: user.id })
+        .eq("id", todo.id);
       supabaseError = error;
     } else {
       const { error } = await supabaseClient
@@ -57,8 +58,8 @@ const ManageTodo = ({ isOpen, onClose, initialRef, todo, setTodo }) => {
         .insert([{ title, description, isComplete, user_id: user.id }]);
       supabaseError = error;
     }
-    setIsLoading(false);
 
+    setIsLoading(false);
     if (supabaseError) {
       setErrorMessage(supabaseError.message);
     } else {
@@ -71,9 +72,9 @@ const ManageTodo = ({ isOpen, onClose, initialRef, todo, setTodo }) => {
     setDescription("");
     setIsComplete(false);
     setTodo(null);
-
     onClose();
   };
+
   return (
     <Modal
       isOpen={isOpen}

@@ -25,7 +25,9 @@ const SignIn = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const { error } = await supabaseClient.auth.signIn({ email });
+      const { error } = await supabaseClient.auth.signIn({
+        email,
+      });
       if (error) {
         setError(error.message);
       } else {
@@ -37,9 +39,11 @@ const SignIn = () => {
       setIsLoading(false);
     }
   };
+
   const changeHandler = (event) => {
     setEmail(event.target.value);
   };
+
   return (
     <Box minH="100vh" py="12" px={{ base: "4", lg: "8" }} bg="gray.50">
       <Box maxW="md" mx="auto">
